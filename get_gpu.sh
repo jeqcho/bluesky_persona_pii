@@ -1,1 +1,0 @@
-salloc --account=def-rrabba --ntasks=1 --cpus-per-task=16 --mem=256G --gres=gpu:1 --time=00-03:00:00

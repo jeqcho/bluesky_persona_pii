@@ -46,7 +46,7 @@ scp -r processed_25_clusters "${REMOTE}:~/"
 Then on the EC2 instance, make sure the virtual environment is activated and installed.
 
 ```bash
-cd ~/steering-sm-personas
+cd ~/bluesky_persona_pii
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -54,7 +54,7 @@ pip install -r requirements.txt
 I first ran `merge_df.py` to merge all the 25 clusters into one cluster and break the chains into messages while keeping track of the IDs. This outputs `~/all_messages/merged_messages.parquet`.
 
 ```bash
-cd ~/steering-sm-personas/pii
+cd ~/bluesky_persona_pii/src
 python merge_df.py
 ```
 
@@ -64,7 +64,7 @@ I then ran `sample.py` to get some smaller files in `all_messages/` to work with
 python sample.py
 ```
 
-Then run the pii removal in the background, will take about 2 hours.
+Then run the pii removal in the background, will take about 2 hours. If you want to test instead, you can use a smaller file say `subsample_10k.parquet` by editing `conf.json`.
 
 ```bash
 nohup python pii_temp.py > logs/pii.log 2>&1 &
@@ -76,7 +76,7 @@ Then run `rebuild_chains.py` to get it back into a blob at `full_data/single_clu
 python rebuild_chains.py
 ```
 
-Next we will rebuild the clusters, and remove the `user_id`. We first need to generate a secret key to be used for hashing (see `pii/hashing` for more details).
+Next we will rebuild the clusters, and remove the `user_id`. We first need to generate a secret key to be used for hashing.
 
 ```bash
 echo HASH_SECRET=$(openssl rand -base64 32) > .env

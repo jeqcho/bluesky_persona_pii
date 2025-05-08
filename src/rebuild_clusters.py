@@ -1,4 +1,4 @@
-# input: pii/single_cluster.jsonl and a list of folders e.g. [/processed_2_clusters,processed_25_clusters]
+# input: src/full_data/single_cluster.jsonl and a list of folders e.g. [/processed_2_clusters,processed_25_clusters]
 # output: cluster_X.jsonl where X is an integer from 0 upwards
 
 # for each given folder, take the user_clusters.json file in them
