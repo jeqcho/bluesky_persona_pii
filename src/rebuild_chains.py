@@ -78,6 +78,9 @@ def process_and_write():
                 raise ValueError(f"Row has neither text nor actions: {row_dict}")
             if has_actions:
                 msg["actions"] = json.loads(row_dict["actions"])
+                # remove fields that are always false
+                del msg["actions"]["ignore"]
+                del msg["actions"]["profile_update"]
             else:
                 msg["text"] = row_dict["scrubbed_output"]
             
