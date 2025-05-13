@@ -27,6 +27,16 @@ OUTPUT_FILE = Path(__file__).parent / "full_data" / "single_cluster.jsonl"
 def write_chain(fout: TextIOWrapper, chain: list[Dict[str, Any]]):
     # make sure the chain is sorted by time
     chain = sorted(chain, key=lambda message: message["relative_integer_time"])
+    # add in actions for textual ones
+    if not any("actions" in message for message in chain):
+        # add in all actions
+        chain[-1]["actions"] = {"like": False, "unlike": False, "repost": False, "unrepost": False, "follow": False, "unfollow": False, "block": False, "unblock": False, "post_update": False, "post_delete": False, "quote": False, "post": False, "reply": False}
+        if len(chain) == 1:
+            # it's a post
+            chain[-1]["actions"]["post"] = True
+        else:
+            # it's a reply
+            chain[-1]["actions"]["reply"] = True
     fout.write(json.dumps(chain) + "\n")
 
 
@@ -81,6 +91,9 @@ def process_and_write():
                 # remove fields that are always false
                 del msg["actions"]["ignore"]
                 del msg["actions"]["profile_update"]
+                # add in other actions
+                msg["actions"]["post"] = False
+                msg["actions"]["reply"] = False
             else:
                 msg["text"] = row_dict["scrubbed_output"]
             
