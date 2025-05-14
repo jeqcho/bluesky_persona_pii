@@ -25,8 +25,11 @@ OUTPUT_FILE = Path(__file__).parent / "full_data" / "single_cluster.jsonl"
 
 
 def write_chain(fout: TextIOWrapper, chain: list[Dict[str, Any]]):
-    # make sure the chain is sorted by time
-    chain = sorted(chain, key=lambda message: message["relative_integer_time"])
+    # make sure the chain is sorted by original time
+    chain = sorted(chain, key=lambda message: message["original_order"])
+    # delete the key
+    for message in chain:
+        del message["original_order"]
     # add in actions for textual ones
     if not any("actions" in message for message in chain):
         # add in all actions
@@ -37,7 +40,12 @@ def write_chain(fout: TextIOWrapper, chain: list[Dict[str, Any]]):
         else:
             # it's a reply
             chain[-1]["actions"]["reply"] = True
-    fout.write(json.dumps(chain) + "\n")
+    # make sure no other messages have actions
+    for message in chain[:-1]:
+        assert "actions" not in message, f"actions found in {chain=}"
+    # add the thread key
+    payload = {"thread": chain}
+    fout.write(json.dumps(payload) + "\n")
 
 
 def process_and_write():
@@ -67,6 +75,7 @@ def process_and_write():
             msg = {
                 "user_id": row_dict["user_id"],
                 "relative_integer_time": row_dict["relative_integer_time"],
+                "original_order": row_dict["original_order"],
             }
 
             has_actions = (

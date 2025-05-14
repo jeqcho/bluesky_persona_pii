@@ -64,13 +64,14 @@ I then ran `sample.py` to get some smaller files in `all_messages/` to work with
 python sample.py
 ```
 
-Then run the pii removal in the background, will take about 2 hours. If you want to test instead, you can use a smaller file say `subsample_10k.parquet` by editing `conf.json`.
+Then run the pii removal in the background, will take about 2 hours. If you want to test instead, you can use a smaller file say `subsample_10k.parquet` by editing `conf.json`. This saves to `full_data/pii_dataset_tags.parquet`.
 
 ```bash
+mkdir logs
 nohup python pii_temp.py > logs/pii.log 2>&1 &
 ```
 
-Then run `rebuild_chains.py` to get it back into a blob at `full_data/single_cluster.jsonl`, takes about 6 minutes
+Then run `rebuild_chains.py` to get it back into a blob at `full_data/single_cluster.jsonl`, takes about 8 minutes
 
 ```bash
 python rebuild_chains.py
@@ -114,13 +115,27 @@ scp -o "ControlPath=~/.ssh/cm-%r@%h:%p" -r cleaned/processed_25_clusters jchooi@
 ## Upload to Huggingface
 
 ```bash
-
 # Install the Hugging Face CLI
 pip install -U "huggingface_hub[cli]"
 
 # Login with your Hugging Face credentials
 huggingface-cli login
+```
 
+If you are making updates, you might have to pull first
+
+```bash
+huggingface-cli download ComplexDataLab/BluePrint --repo-type dataset
+```
+
+Then copy over whatever that is useful, for example
+
+```bash
+# EXAMPLE
+cp ~/.cache/huggingface/hub/datasets--ComplexDataLab--BluePrint/snapshots/34ff669510ee4db3a26952076b711a6afa75970b/{README.md,croissant.json} ~/cleaned/
+```
+
+```bash
 cd ~/cleaned
 
 # Push your dataset files

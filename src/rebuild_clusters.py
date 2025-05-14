@@ -52,18 +52,17 @@ def process_folder(folder_path: str):
     # Remove existing files if the directory exists
     if output_dir.exists():
         for file in output_dir.iterdir():
-            file.unlink()
-        print(f"Removed existing files from {output_dir}")
+            if file.suffix.lower() == '.jsonl':
+                file.unlink()
+        print(f"Removed existing JSONL files from {output_dir}")
     else:
         output_dir.mkdir(exist_ok=True, parents=True)
 
     print(f"Processing folder: {folder_path}")
 
-    # First, copy over user_clusters.json to the output directory
-    user_clusters_file = path / "user_clusters.json"
-
-    assert user_clusters_file.exists()
     # Load the user clusters mapping
+    user_clusters_file = path / "user_clusters.json"
+    assert user_clusters_file.exists()
     user_clusters = load_user_clusters(path)
 
     # Create a mapping from cluster ID to output file
@@ -79,7 +78,7 @@ def process_folder(folder_path: str):
             chain = json.loads(line)
             assert chain
             # Get the user_id from the last message in the chain
-            last_message = chain[-1]
+            last_message = chain["thread"][-1]
             user_id = last_message["user_id"]
 
             # Determine which cluster this user belongs to
@@ -90,22 +89,16 @@ def process_folder(folder_path: str):
 
             # drop the user_id
             dids = []
-            for message in chain:
+            for message in chain["thread"]:
                 dids.append(message.pop("user_id"))
-            dump = json.dumps(chain, sort_keys=True)
-            for i, message in enumerate(chain):
+            dump = json.dumps(chain["thread"], sort_keys=True)
+            for i, message in enumerate(chain["thread"]):
                 hashed_did = hashlib.sha256(
                     f"{dids[i]}{dump}{SECRET}".encode()
                 ).hexdigest()
                 message["user_id"] = hashed_did
 
             line = json.dumps(chain) + "\n"
-            # erase user_id and use anonymous_user_id
-            # for message in chain:
-            #     message["user_id"] = message["anonymized_user_id"]
-            #     del message["anonymized_user_id"]
-
-            # line = json.dumps(chain) + '\n'
 
             # Write the chain to the appropriate cluster file
             if cluster_id not in cluster_files:
