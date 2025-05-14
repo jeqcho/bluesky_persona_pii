@@ -1,6 +1,6 @@
 # PII Removal
 
-I did this using c7a.4xlarge EC2 instance (c8g would be cheaper and faster but they ran out).
+I did this using c7i.4xlarge EC2 instance (c8g would be cheaper and faster but they ran out).
 
 Remember to make sure that each side has the public SSH keys of the other in `/.ssh/authorized_keys`.
 
@@ -134,6 +134,8 @@ Then copy over whatever that is useful, for example
 # EXAMPLE
 cp ~/.cache/huggingface/hub/datasets--ComplexDataLab--BluePrint/snapshots/34ff669510ee4db3a26952076b711a6afa75970b/{README.md,croissant.json} ~/cleaned/
 ```
+
+Then upload the rest.
 
 ```bash
 cd ~/cleaned
