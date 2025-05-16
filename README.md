@@ -166,4 +166,17 @@ Unix epoch is removed and reassigned from 1 to 52M+ as integers. Ties are broken
 
 ## Data Removal Request
 
-If a data removal request is received, go to the [data_removal](data_removal/) folder and read the instructions there.
+If a data removal request is received:
+
+1. Add the user's DID to `src/data_removal/did_removal_list.txt` (one DID per line)
+2. Run the removal script:
+
+```bash
+cd ~/bluesky_persona_pii/src/data_removal
+chmod +x ./remove.sh
+./remove.sh
+```
+
+The script will:
+- Remove the user's data from all dataset files
+- Automatically upload the updated dataset to Hugging Face
