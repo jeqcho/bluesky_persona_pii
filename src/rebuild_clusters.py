@@ -86,6 +86,7 @@ def process_folder(folder_path: str):
             assert cluster_id is not None, (
                 f"User ID {user_id} not found in user_clusters mapping. Cannot determine cluster assignment."
             )
+            chain["cluster_id"] = int(cluster_id)
 
             # drop the user_id
             dids = []
