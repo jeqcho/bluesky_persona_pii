@@ -20,6 +20,7 @@ from tqdm import tqdm
 
 INPUT_FILE = Path(__file__).parent / "full_data" / "pii_dataset_tags.parquet"
 OUTPUT_FILE = Path(__file__).parent / "full_data" / "single_cluster.jsonl"
+DID_LIST_FILE: Path = Path(__file__).parent / "src" / "data_removal" / "did_removal_list.txt"
 
 # Columns: anonymized_user_id,relative_integer_time,chain_id,actions,scrubbed_output
 
@@ -27,6 +28,9 @@ OUTPUT_FILE = Path(__file__).parent / "full_data" / "single_cluster.jsonl"
 def write_chain(fout: TextIOWrapper, chain: list[Dict[str, Any]]):
     # make sure the chain is sorted by original time
     chain = sorted(chain, key=lambda message: message["original_order"])
+    # skip chain if user requested to be deleted
+    if chain[-1]["user_did"] in PROTECTED_DIDS:
+        return
     # delete the key
     for message in chain:
         del message["original_order"]
@@ -116,4 +120,6 @@ def process_and_write():
 
 
 if __name__ == "__main__":
+    with open(DID_LIST_FILE, 'r') as f:
+        PROTECTED_DIDS = set([line.strip() for line in f if line.strip()])
     process_and_write()
