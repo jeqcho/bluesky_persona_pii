@@ -164,3 +164,6 @@ Unix epoch is removed and reassigned from 1 to 52M+ as integers. Ties are broken
 
 `did` for each message is removed, and the `did` is replaced with the SHA256 hash of the `relative_integer_time` of their first message.
 
+## Data Removal Request
+
+If a data removal request is received, go to the [data_removal](data_removal/) folder and read the instructions there.
